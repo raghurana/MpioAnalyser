@@ -6,7 +6,7 @@ namespace MpioAnalyser.WinApp
     {
         public string ServerName { get; set; }
 
-        public int DriveNumber { get; set; }
+        public int DiskIndexNumber { get; set; }
 
         public string Paths { get; set; }
 

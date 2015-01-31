@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using NLog;
@@ -54,7 +55,7 @@ namespace MpioAnalyser.WinApp
                             var result = new MpClaimCommandResult
                                 {
                                     ServerName = serverName,
-                                    DriveNumber = driveNum,
+                                    DiskIndexNumber = driveNum,
                                     CommandExecutedSuccessfully = true,
                                     Paths = MpioParser.GetPaths(outputLines[startLine]),
                                     ControllingDSM = MpioParser.GetControllingDsm(outputLines[startLine + 1]),
@@ -75,7 +76,7 @@ namespace MpioAnalyser.WinApp
                             var result = new MpClaimCommandResult
                                 {
                                     ServerName = serverName,
-                                    DriveNumber = driveNum,
+                                    DiskIndexNumber = driveNum,
                                     CommandExecutedSuccessfully = false,
                                     FailureReason = String.Join(". ", outputLines.ToArray())
                                 };
@@ -90,7 +91,7 @@ namespace MpioAnalyser.WinApp
                     var result = new MpClaimCommandResult
                     {
                         ServerName = serverName,
-                        DriveNumber = currentDrvNum,
+                        DiskIndexNumber = currentDrvNum,
                         CommandExecutedSuccessfully = false,
                         FailureReason = ex.Message
                     };
@@ -98,7 +99,9 @@ namespace MpioAnalyser.WinApp
                     results.Add( result );
                 }
             }
-            
+
+            var t = results.ToLookup(r => r.ServerName);
+
             dataGridView1.DataSource = results;
             label4.Text = results.Count.ToString(CultureInfo.InvariantCulture);
             MessageBox.Show( "Done" );
