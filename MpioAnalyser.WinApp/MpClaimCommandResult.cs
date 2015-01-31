@@ -2,7 +2,7 @@
 
 namespace MpioAnalyser.WinApp
 {
-    public class CheckStatus
+    public class MpClaimCommandResult
     {
         public string ServerName { get; set; }
 

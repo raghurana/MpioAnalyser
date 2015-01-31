@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using NLog;
 
 namespace MpioAnalyser.WinApp
 {
     public partial class MainForm : Form
     {
-        private readonly List<CheckStatus> results = new List<CheckStatus>();
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly List<MpClaimCommandResult> results = new List<MpClaimCommandResult>();
 
         public MainForm()
         {
@@ -35,60 +35,23 @@ namespace MpioAnalyser.WinApp
                     for (var driveNum = 0; driveNum < numberOfDrives; driveNum++)
                     {
                         currentDrvNum = driveNum;
-                        trace.AppendLine("");
-                        trace.AppendLine( "=========================" );
-                        trace.AppendLine( "Server Name:" + serverName );
-                        trace.AppendLine( "Device Number:" + driveNum );
-                        trace.AppendLine( "=========================" );
+                        logger.Log(LogLevel.Debug,"");
+                        logger.Log(LogLevel.Debug, "=========================" );
+                        logger.Log(LogLevel.Debug, "Server Name:" + serverName );
+                        logger.Log(LogLevel.Debug, "Device Number:" + driveNum );
+                        logger.Log(LogLevel.Debug, "=========================" );
 
-                        var process = new Process();
-                        var startInfo = new ProcessStartInfo
-                            {
-                                UseShellExecute = false,
-                                WindowStyle = ProcessWindowStyle.Hidden,
-                                RedirectStandardOutput = true,
-                                RedirectStandardError = true,
-                                FileName = "psexec.exe",
-                                Arguments = string.Format("\\\\{0} mpclaim -s -d {1}", serverName, driveNum)
-                            };
+                        var stdOutput = MpClaimCommandRunner.RunCommand(serverName, currentDrvNum);
+                        var outputLines = MpClaimCommandRunner.GetStandardOutputLines(stdOutput);
 
-                        process.StartInfo = startInfo;
-                        process.Start();
-                        process.WaitForExit();
-
-                        var stdOutput = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
-                        trace.AppendLine("Full Standard Output:");
-                        trace.AppendLine("----------------");
-                        trace.AppendLine(stdOutput);
-                        trace.AppendLine("");
-                        trace.AppendLine("----------------");
-                        trace.AppendLine("Trimmed Standard Output");
-                        trace.AppendLine( "----------------" );
-
-                        var outputLines = new List<string>();
-                        using (var reader = new StringReader(stdOutput))
-                        {
-                            String line;
-                            do
-                            {
-                                line = reader.ReadLine();
-
-                                if (!string.IsNullOrEmpty(line))
-                                {
-                                    trace.AppendLine(line);
-                                    if ( line.StartsWith( "PsExec", true, CultureInfo.CurrentCulture ) ) 
-                                        break;
-
-                                    outputLines.Add( line );
-                                }
-                                    
-                            } while ( line != null );
-                        }
+                        logger.Log(LogLevel.Debug,"----------------");
+                        logger.Log(LogLevel.Debug,"Trimmed Standard Output");
+                        logger.Log(LogLevel.Debug,"----------------" );
 
                         if (outputLines.Count >= 8)
                         {
                             const int startLine = 0;
-                            var result = new CheckStatus
+                            var result = new MpClaimCommandResult
                                 {
                                     ServerName = serverName,
                                     DriveNumber = driveNum,
@@ -106,9 +69,10 @@ namespace MpioAnalyser.WinApp
 
                             results.Add(result);
                         }
+
                         else
                         {
-                            var result = new CheckStatus
+                            var result = new MpClaimCommandResult
                                 {
                                     ServerName = serverName,
                                     DriveNumber = driveNum,
@@ -123,9 +87,7 @@ namespace MpioAnalyser.WinApp
 
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
-
-                    var result = new CheckStatus
+                    var result = new MpClaimCommandResult
                     {
                         ServerName = serverName,
                         DriveNumber = currentDrvNum,
@@ -136,20 +98,17 @@ namespace MpioAnalyser.WinApp
                     results.Add( result );
                 }
             }
-
-            File.WriteAllText( "Output.txt", trace.ToString() );
-            MessageBox.Show("Done");
+            
             dataGridView1.DataSource = results;
             label4.Text = results.Count.ToString(CultureInfo.InvariantCulture);
+            MessageBox.Show( "Done" );
         }
 
         private void dataGridView1_RowHeaderMouseClick( object sender, DataGridViewCellMouseEventArgs e )
         {
-            if (e.RowIndex > 0 && e.RowIndex < results.Count)
-            {
-                var currentStatus = results[e.RowIndex];
-                dataGridView2.DataSource = currentStatus.PathInfos;
-            }
+            if (e.RowIndex <= 0 || e.RowIndex >= results.Count) return;
+            var currentStatus = results[e.RowIndex];
+            dataGridView2.DataSource = currentStatus.PathInfos;
         }
     }
 }
