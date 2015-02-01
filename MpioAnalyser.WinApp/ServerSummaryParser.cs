@@ -28,7 +28,7 @@ namespace MpioAnalyser.WinApp
                 csvRecord.PathsByDiskNumber             = GetPathsByDiskNumber(successfulDiskCmdResults);
                 csvRecord.DiskPathInfo                  = GetDiskPathInfos(successfulDiskCmdResults);
                 csvRecord.IsInGoodState                 = GetGoodState(successfulDiskCmdResults);
-                csvRecord.FailureReasonsByDisk          = GetFailureReasonsByDisk(unsuccessfulDiskCmdResults);
+                csvRecord.WarningErrorsByDisk           = GetWarningsErrorsByDisk(unsuccessfulDiskCmdResults);
 
                 records.Add(csvRecord);
             }
@@ -75,9 +75,9 @@ namespace MpioAnalyser.WinApp
             return diskCommandResults.All( c => c.PathInfos.All( p => string.Equals( "Active/Optimized", p.State, StringComparison.CurrentCultureIgnoreCase ) ) );
         }
 
-        private static string GetFailureReasonsByDisk( IEnumerable<MpClaimCommandResult> diskCommandResults )
+        private static string GetWarningsErrorsByDisk( IEnumerable<MpClaimCommandResult> diskCommandResults )
         {
-            return String.Join(MultiValueDelimeter, diskCommandResults.Select(r => r.FailureReason).ToArray());
+            return String.Join(MultiValueDelimeter, diskCommandResults.Select(r => string.Format("{0}{1}{2}{3}", DiskLabel, r.DiskIndexNumber, DiskPathDelimeter, r.CommandFailureReason)).ToArray());
         }
     }
 }

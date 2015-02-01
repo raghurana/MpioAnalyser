@@ -87,7 +87,7 @@ namespace MpioAnalyser.WinApp
                                     ServerName = serverName,
                                     DiskIndexNumber = driveNum,
                                     CommandExecutedSuccessfully = false,
-                                    FailureReason = String.Join(". ", outputLines.ToArray())
+                                    CommandFailureReason = String.Join(". ", outputLines.ToArray())
                                 };
 
                             results.Add(result);
@@ -104,7 +104,7 @@ namespace MpioAnalyser.WinApp
                             ServerName = serverName,
                             DiskIndexNumber = currentDrvNum,
                             CommandExecutedSuccessfully = false,
-                            FailureReason = ex.Message
+                            CommandFailureReason = ex.Message
                         };
 
                     results.Add(result);

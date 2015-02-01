@@ -15,6 +15,6 @@ namespace MpioAnalyser.WinApp
 
         public bool IsInGoodState { get; set; }
 
-        public string FailureReasonsByDisk { get; set; }
+        public string WarningErrorsByDisk { get; set; }
     }
 }

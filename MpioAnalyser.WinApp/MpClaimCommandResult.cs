@@ -16,7 +16,7 @@ namespace MpioAnalyser.WinApp
 
         public bool CommandExecutedSuccessfully { get; set; }
 
-        public string FailureReason { get; set; }
+        public string CommandFailureReason { get; set; }
 
         public List<PathInfo> PathInfos = new List<PathInfo>();
     }

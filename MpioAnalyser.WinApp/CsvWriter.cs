@@ -9,7 +9,8 @@ namespace MpioAnalyser.WinApp
         {
             var engine = new FileHelperEngine<FinalCsvRecord>
                 {
-                    HeaderText = @"Server,Disks Queried Successfully,Paths By Disk,Disks Path Info,Is In Good State, Failure Reasons By Disk"
+                    HeaderText = 
+                        @"Server,Disks Queried Successfully,Paths By Disk,All Disks Path Info,Is In Good State, Failure Reasons By Disk"
                 };
             engine.WriteFile(path, records);
         }
