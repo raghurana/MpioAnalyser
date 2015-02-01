@@ -77,7 +77,8 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MpioParser.cs" />
-    <Compile Include="MpioParserTests.cs" />
+    <Compile Include="Testing\CsvGenerationTests.cs" />
+    <Compile Include="Testing\MpioParserTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerSummaryParser.cs" />

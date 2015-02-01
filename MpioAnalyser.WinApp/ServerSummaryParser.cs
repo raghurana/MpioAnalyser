@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace MpioAnalyser.WinApp
@@ -7,7 +8,7 @@ namespace MpioAnalyser.WinApp
     public class ServerSummaryParser
     {
         private const string MultiValueDelimeter = "|";
-        private const string DiskLabel = "Disk-";
+        private const string DiskLabel = "Disk";
         private const string DiskPathDelimeter = "~";
 
         public static IEnumerable<FinalCsvRecord> SummarizeServerRecords(ILookup<string, MpClaimCommandResult> serverRecords)
@@ -39,7 +40,7 @@ namespace MpioAnalyser.WinApp
         {
             var driveNumbers =
                 diskCommandResults
-                    .Select(c => c.DiskIndexNumber.ToString())
+                    .Select(c => string.Format("{0}{1}", DiskLabel, c.DiskIndexNumber.ToString(CultureInfo.InvariantCulture)))
                     .ToArray();
 
             return string.Join(MultiValueDelimeter, driveNumbers);
@@ -60,7 +61,7 @@ namespace MpioAnalyser.WinApp
             var paths = new List<string>();
             foreach (var result in diskCommandResults.Where( r => r.PathInfos.Count >= 2 ))
             {
-                paths.Add( string.Format( "{0}{1}{2}Path1Id-{3} Path1State-{4} Path2Id-{5} Path2State-{6}",
+                paths.Add( string.Format( "{0}{1}{2}Path1(Id-{3} State-{4}){0}{1}{2}Path2(Id-{5} State-{6})",
                                             DiskLabel, result.DiskIndexNumber, DiskPathDelimeter,
                                             result.PathInfos[0].PathId, result.PathInfos[0].State,
                                             result.PathInfos[1].PathId, result.PathInfos[1].State ) );

@@ -1,5 +1,8 @@
-﻿namespace MpioAnalyser.WinApp
+﻿using FileHelpers;
+
+namespace MpioAnalyser.WinApp
 {
+    [DelimitedRecord( "," )] 
     public class FinalCsvRecord
     {
         public string ServerName { get; set; }

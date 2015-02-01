@@ -23,10 +23,9 @@ namespace MpioAnalyser.WinApp
             return GetControllingDsm(line);
         }
 
-        public static PathInfo GetPathInfo(string line, Logger logger)
+        public static PathInfo GetPathInfo(string line)
         {
             var columns = line.Split(' ').Where(c => !string.IsNullOrEmpty(c)).Select( c => c.Trim() ).ToArray();
-            logger.Log(LogLevel.Debug, string.Format("Total Path Info Columns = {0}", columns.Length));
 
             if (columns.Length >= 4)
                 return new PathInfo

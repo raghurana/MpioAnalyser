@@ -71,8 +71,8 @@ namespace MpioAnalyser.WinApp
                                     SerialNumber = MpioParser.GetControllingDsm(outputLines[startLine + 2]),
                                 };
 
-                            var path1 = MpioParser.GetPathInfo(outputLines[startLine + 6], logger);
-                            var path2 = MpioParser.GetPathInfo(outputLines[startLine + 7], logger);
+                            var path1 = MpioParser.GetPathInfo(outputLines[startLine + 6]);
+                            var path2 = MpioParser.GetPathInfo(outputLines[startLine + 7]);
 
                             result.PathInfos.Add(path1);
                             result.PathInfos.Add(path2);

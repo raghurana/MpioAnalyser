@@ -1,7 +1,7 @@
-﻿using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NLog;
 
-namespace MpioAnalyser.WinApp
+namespace MpioAnalyser.WinApp.Testing
 {
     [TestClass]
     public class MpioParserTests
@@ -34,7 +34,7 @@ namespace MpioAnalyser.WinApp
         public void GetPathInfoTest()
         {
             const string testLine = "0000000077080000 Active/Optimized   008|000|000|000   0";
-            var output = MpioParser.GetPathInfo( testLine, new StringBuilder() );
+            var output = MpioParser.GetPathInfo( testLine);
             Assert.AreEqual( "0000000077080000", output.PathId );
             Assert.AreEqual( "Active/Optimized", output.State );
             Assert.AreEqual( "008|000|000|000", output.ScsiAddress );
