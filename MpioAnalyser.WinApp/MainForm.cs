@@ -29,42 +29,51 @@ namespace MpioAnalyser.WinApp
         {
             results.Clear();
 
-            #region Iterate Server and Disks
-
-            foreach (var serverPlusDrives in textBox1.Lines)
+            string errorMessage;
+            List<ServerDevicePair> serverDevicePairs;
+            var isInputValid = InputValidator.Validate(textBox1.Lines, out serverDevicePairs, out errorMessage);
+            if (!isInputValid)
             {
-                var splits = serverPlusDrives.Split('~');
-                var serverName = splits[0];
-                var numberOfDrives = Int32.Parse(splits[1]);
+                MessageBox.Show(errorMessage);
+                return;
+            }
 
-                var currentDrvNum = 0;
-                try
+            foreach (var pair in serverDevicePairs)
+            {
+                for (var diskNumber = 0; diskNumber < pair.NoOfDisks; diskNumber++)
                 {
-                    for (var driveNum = 0; driveNum < numberOfDrives; driveNum++)
-                    {
-                        currentDrvNum = driveNum;
-                        logger.Log(LogLevel.Debug, "");
-                        logger.Log(LogLevel.Debug, "=========================");
-                        logger.Log(LogLevel.Debug, "Server Name:" + serverName);
-                        logger.Log(LogLevel.Debug, "Device Number:" + driveNum);
-                        logger.Log(LogLevel.Debug, "=========================");
+                    #region Log Header Info
 
-                        var stdOutput = MpClaimCommandRunner.RunCommand(serverName, currentDrvNum);
+                    logger.Log(LogLevel.Debug, "");
+                    logger.Log(LogLevel.Debug, "=========================");
+                    logger.Log(LogLevel.Debug, string.Format("Server Name: {0}", pair.ServerName));
+                    logger.Log(LogLevel.Debug, string.Format("Disk Number: {0}", diskNumber));
+                    logger.Log(LogLevel.Debug, "=========================");
+
+                    #endregion
+
+                    try
+                    {
+                        var stdOutput   = MpClaimCommandRunner.RunCommand(pair.ServerName, diskNumber);
                         var outputLines = MpClaimCommandRunner.GetStandardOutputLines(stdOutput);
 
-                        logger.Log(LogLevel.Debug, "----------------");
-                        logger.Log(LogLevel.Debug, "Trimmed Standard Output");
-                        logger.Log(LogLevel.Debug, "----------------");
+                        #region Log Trimmed Header Info
 
-                        #region Parse Mpio Command Result
+                        logger.Log(LogLevel.Debug, "-----------------------");
+                        logger.Log(LogLevel.Debug, "Trimmed Standard Output");
+                        logger.Log(LogLevel.Debug, "-----------------------");
+
+                        #endregion
 
                         if (outputLines.Count >= 8)
                         {
+                            #region Parseable Output Found
+
                             const int startLine = 0;
                             var result = new MpClaimCommandResult
                                 {
-                                    ServerName = serverName,
-                                    DiskIndexNumber = driveNum,
+                                    ServerName = pair.ServerName,
+                                    DiskIndexNumber = diskNumber,
                                     CommandExecutedSuccessfully = true,
                                     Paths = MpioParser.GetPaths(outputLines[startLine]),
                                     ControllingDSM = MpioParser.GetControllingDsm(outputLines[startLine + 1]),
@@ -78,40 +87,46 @@ namespace MpioAnalyser.WinApp
                             result.PathInfos.Add(path2);
 
                             results.Add(result);
+
+                            #endregion
                         }
 
                         else
                         {
+                            #region Parseable Output NOT Found
+
                             var result = new MpClaimCommandResult
                                 {
-                                    ServerName = serverName,
-                                    DiskIndexNumber = driveNum,
+                                    ServerName = pair.ServerName,
+                                    DiskIndexNumber = diskNumber,
                                     CommandExecutedSuccessfully = false,
                                     CommandFailureReason = String.Join(". ", outputLines.ToArray())
                                 };
 
                             results.Add(result);
+
+                            #endregion
                         }
+                    }
+
+                    catch (Exception ex)
+                    {
+                        #region Command Failed to Execute on the current Disk Number
+
+                        var result = new MpClaimCommandResult
+                            {
+                                ServerName = pair.ServerName,
+                                DiskIndexNumber = diskNumber,
+                                CommandExecutedSuccessfully = false,
+                                CommandFailureReason = ex.Message
+                            };
+
+                        results.Add(result);
 
                         #endregion
                     }
                 }
-
-                catch (Exception ex)
-                {
-                    var result = new MpClaimCommandResult
-                        {
-                            ServerName = serverName,
-                            DiskIndexNumber = currentDrvNum,
-                            CommandExecutedSuccessfully = false,
-                            CommandFailureReason = ex.Message
-                        };
-
-                    results.Add(result);
-                }
             }
-
-            #endregion
 
             dataGridView1.DataSource = results;
             label4.Text = results.Count.ToString(CultureInfo.InvariantCulture);

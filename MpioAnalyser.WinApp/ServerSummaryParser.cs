@@ -72,7 +72,10 @@ namespace MpioAnalyser.WinApp
 
         private static bool GetGoodState(IEnumerable<MpClaimCommandResult> diskCommandResults)
         {
-            return diskCommandResults.All( c => c.PathInfos.All( p => string.Equals( "Active/Optimized", p.State, StringComparison.CurrentCultureIgnoreCase ) ) );
+            return
+                diskCommandResults.Any() &&
+                diskCommandResults
+                    .All(c => c.PathInfos.All(p => string.Equals("Active/Optimized", p.State, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         private static string GetWarningsErrorsByDisk( IEnumerable<MpClaimCommandResult> diskCommandResults )

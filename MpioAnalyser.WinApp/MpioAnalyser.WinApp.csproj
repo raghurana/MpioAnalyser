@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="CsvWriter.cs" />
     <Compile Include="FinalCsvRecord.cs" />
+    <Compile Include="InputValidator.cs" />
     <Compile Include="MpClaimCommandRunner.cs" />
     <Compile Include="MpClaimCommandResult.cs" />
     <Compile Include="MainForm.cs">
