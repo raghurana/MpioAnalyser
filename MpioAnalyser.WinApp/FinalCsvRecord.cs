@@ -12,6 +12,6 @@
 
         public bool IsInGoodState { get; set; }
 
-        public string FailureReasonsByDrive { get; set; }
+        public string FailureReasonsByDisk { get; set; }
     }
 }

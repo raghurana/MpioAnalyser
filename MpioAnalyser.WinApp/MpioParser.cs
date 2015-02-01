@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using System.Text;
+using NLog;
 
 namespace MpioAnalyser.WinApp
 {
@@ -23,10 +23,10 @@ namespace MpioAnalyser.WinApp
             return GetControllingDsm(line);
         }
 
-        public static PathInfo GetPathInfo(string line, StringBuilder trace)
+        public static PathInfo GetPathInfo(string line, Logger logger)
         {
             var columns = line.Split(' ').Where(c => !string.IsNullOrEmpty(c)).Select( c => c.Trim() ).ToArray();
-            trace.AppendLine("Total Path Info Columns = " + columns.Length);
+            logger.Log(LogLevel.Debug, string.Format("Total Path Info Columns = {0}", columns.Length));
 
             if (columns.Length >= 4)
                 return new PathInfo

@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CsvWriter.cs" />
     <Compile Include="FinalCsvRecord.cs" />
     <Compile Include="MpClaimCommandRunner.cs" />
     <Compile Include="MpClaimCommandResult.cs" />
